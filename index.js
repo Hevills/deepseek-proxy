@@ -41,5 +41,5 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Vercel 需要导出 app
+// Vercel 需要导出 app（不要用 app.listen）
 module.exports = app;
