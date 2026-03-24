@@ -2,10 +2,10 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
-// CORS 中间件
+// 允许所有来源访问（CORS）
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
@@ -14,8 +14,6 @@ app.use((req, res, next) => {
 });
 
 app.use(express.json());
-
-// 提供静态文件服务
 app.use(express.static(__dirname));
 
 // DeepSeek API 代理端点
@@ -25,14 +23,9 @@ app.post('/api/chat', async (req, res) => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer sk-4b073b46815842bbab4b575763120946'
+        'Authorization': 'Bearer sk-f995cdc469b34286a7b10bd4088161d0'
       },
-      body: JSON.stringify({
-        model: "deepseek-chat",
-        messages: req.body.messages,
-        temperature: req.body.temperature || 0.7,
-        max_tokens: req.body.max_tokens || 1000
-      })
+      body: JSON.stringify(req.body)
     });
     
     const data = await response.json();
@@ -48,7 +41,5 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-  console.log(`DeepSeek 代理运行在 http://localhost:${port}`);
-});
+// Vercel 需要导出 app
+module.exports = app;
